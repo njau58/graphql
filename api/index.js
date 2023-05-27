@@ -15,7 +15,7 @@ dbConnect()
 
 app.use(cors())
 
-app.use('/graphql',graphqlHTTP({
+app.use('/api',graphqlHTTP({
     schema, 
     graphiql:process.env.NODE_ENV==='development'
 }))
