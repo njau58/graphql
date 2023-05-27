@@ -21,7 +21,7 @@ app.use('/graphql',graphqlHTTP({
 }))
 
 
-if( process.env.NODE_ENV==="development"){
+if( port){
     app.listen(port, console.log(`app listening to port ${port}`))
 
 }
