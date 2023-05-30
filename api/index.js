@@ -15,16 +15,10 @@ dbConnect()
 
 app.use(cors())
 
-// app.use('/api',graphqlHTTP({
-//     schema, 
-//     graphiql:process.env.NODE_ENV==='development'
-// }))
-
-app.get("/test",(req, res)=>{
-
-    res.json({name:'hello'})
-
-})
+app.use('/api',graphqlHTTP({
+    schema, 
+    graphiql:process.env.NODE_ENV==='development'
+}))
 
 if( port){
     app.listen(port, console.log(`app listening to port ${port}`))
