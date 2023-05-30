@@ -17,7 +17,7 @@ app.use(cors())
 
 app.use('/api',graphqlHTTP({
     schema, 
-    graphiql:process.env.NODE_ENV==='development'
+    graphiql:true
 }))
 
 
