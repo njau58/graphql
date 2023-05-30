@@ -26,7 +26,7 @@ const cache = new InMemoryCache({
 });
 
 const client = new ApolloClient({
-uri: '/api',
+uri: `${process.env.REACT_APP_API_URL}/api`,
   cache: cache,
 });
 
