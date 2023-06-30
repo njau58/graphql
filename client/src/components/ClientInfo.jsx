@@ -1,20 +1,25 @@
-import { FaEnvelope, FaPhone, FaIdBadge } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaIdBadge } from "react-icons/fa";
 
 export default function ClientInfo({ client }) {
   return (
-    <>
-      <h5 className='mt-5'>Client Information</h5>
-      <ul className='list-group'>
-        <li className='list-group-item'>
-          <FaIdBadge className='icon' /> {client?.name}
-        </li>
-        <li className='list-group-item'>
-          <FaEnvelope className='icon' /> {client?.email}
-        </li>
-        <li className='list-group-item'>
-          <FaPhone className='icon' /> {client?.phone}
-        </li>
-      </ul>
-    </>
+    <div className="px-9 py-4 h-full w-full rounded-lg border bg-white ">
+
+      <h5 className="text-2xl font-bold  text-gray-900 dark:text-white my-6">
+        Client Information
+      </h5>
+
+      <div className="flex flex-col space-y-3 text-sm">
+        <div className="flex flex-row items-center ">
+          <FaIdBadge className="mr-2 text-gray-500" /> {client?.name}
+        </div>
+        <div className="flex flex-row items-center ">
+          <FaEnvelope className="mr-2 text-gray-500" /> {client?.email}
+        </div>
+        <div className="flex flex-row items-center ">
+          <FaPhone className="mr-2 text-gray-500" /> {client?.phone}
+        </div>
+      </div>
+    
+    </div>
   );
 }

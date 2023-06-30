@@ -1,33 +1,28 @@
 import React, { useState } from "react";
-import { FaUser } from "react-icons/fa";
+import { FaTrash, FaUser } from "react-icons/fa";
 import { useMutation } from "@apollo/client";
 import { ADD_CLIENT } from "../mutations/clientMutations";
 import { GET_CLIENTS } from "../queries/clientQueries";
+import { EDIT_CLIENT } from "../mutations/clientMutations";
 
-const AddClientModal = ({toggleModal}) => {
-
+const EditClientModal = ({ toggleModal, client }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: client.name,
+    email: client.email,
+    phone: client.phone,
   });
 
-  const [addClient] = useMutation(ADD_CLIENT, {
+  const [editClient] = useMutation(EDIT_CLIENT, {
     variables: {
+      id: client.id,
       name: formData.name,
       email: formData.email,
-      phone: formData.phone?.toString(),
+      phone: formData.phone,
     },
-
-    update(cache, { data: { addClient } }) {
-      const { clients } = cache.readQuery({ query: GET_CLIENTS });
-
-      cache.writeQuery({
-        query: GET_CLIENTS,
-
-        data: { clients: [...clients, addClient] },
-      });
-    },
+    onError:(error)=>{
+        alert(error)
+            },
+    refetchQueries: [{ query: GET_CLIENTS }],
   });
 
   const handleOnChange = (e) => {
@@ -44,19 +39,20 @@ const AddClientModal = ({toggleModal}) => {
     ) {
       return alert("Please fiil all the fields.");
     }
-    addClient()
-      .then(res=>toggleModal())
+    editClient()
+      .then((res) => toggleModal())
       .catch((error) => alert(error));
   };
 
-
+  const closeModal = () => {
+    toggleModal();
+  };
 
   return (
     <>
       <div
         aria-hidden="true"
         class="fixed top-0 left-0 right-0 z-50 bg-gray-800 bg-opacity-70  w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0  h-screen"
-       
       >
         <div class="relative  mx-auto max-w-md h-full">
           <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -82,7 +78,7 @@ const AddClientModal = ({toggleModal}) => {
             </button>
             <div class="px-6 py-6 lg:px-8">
               <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-                Add new client
+                Edit client information
               </h3>
               <form onSubmit={onSubmit} class="space-y-6" action="#">
                 <div>
@@ -136,13 +132,24 @@ const AddClientModal = ({toggleModal}) => {
                     onChange={handleOnChange}
                   ></input>
                 </div>
-
-                <button
-                  type="submit"
-                  class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Add client
-                </button>
+                <div className="flex flex-row  space-x-12 items-center justify-center">
+                  <button
+                    type="submit"
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    Update
+                  </button>
+                  <button
+                    onClick={closeModal}
+                    type="button"
+                    class="text-red-600 flex items-center justify-center  hover:text-white border  border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  >
+                    <span className="">
+                      <FaTrash className="mr-2"></FaTrash>
+                    </span>{" "}
+                    Cancel
+                  </button>
+                </div>
               </form>
             </div>
           </div>
@@ -152,4 +159,4 @@ const AddClientModal = ({toggleModal}) => {
   );
 };
 
-export default AddClientModal;
+export default EditClientModal;

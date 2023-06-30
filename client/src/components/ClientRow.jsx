@@ -1,40 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
-import { DELETE_CLIENT } from "../mutations/clientMutations";
-import { useMutation } from "@apollo/client";
-import { GET_CLIENTS } from "../queries/clientQueries";
-import { GET_PROJECTS } from "../queries/projectQueries";
+import { FaEdit } from "react-icons/fa";
+import EditClientModal from "./EditClientModal";
+import ConfirmDeleteClient from "./ConfirmDeleteClient";
+import { FaEye } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { BsTrash } from "react-icons/bs";
 
 const ClientRow = ({ client }) => {
-  const [deleteClient] = useMutation(DELETE_CLIENT, {
-    variables: { id: client.id },
-      refetchQueries:[{query:GET_PROJECTS}],
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
 
-    update(cache, { data: { deleteClient } }) {
-      const { clients } = cache.readQuery({ query: GET_CLIENTS });
+  const toggleEditModal = () => {
+    setShowEditModal(!showEditModal);
+  };
 
-      cache.writeQuery({
-        query: GET_CLIENTS,
-        data: {
-          clients: clients.filter((client) => client.id !== deleteClient.id),
-        },
-      });
-    },
-  });
-
-
+  const toggleConfirmDeleteModal = () => {
+    setShowConfirmDeleteModal(!showConfirmDeleteModal);
+  };
 
   return (
-    <tr>
-      <td>{client.name}</td>
-      <td>{client.email}</td>
-      <td>{client.phone}</td>
-      <td>
-        <button className="btn btn-danger btn-sm " onClick={deleteClient}>
-          <FaTrash />
-        </button>
-      </td>
-    </tr>
+    <>
+      {showEditModal && (
+        <EditClientModal toggleModal={toggleEditModal} client={client} />
+      )}
+      {showConfirmDeleteModal && (
+        <ConfirmDeleteClient
+          client={client}
+          toggleModal={toggleConfirmDeleteModal}
+        />
+      )}
+      <tr className="bg-white border-b overflow-auto w-full dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <th
+          scope="row"
+          className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+        >
+          <div className="pl-3">
+            <div className="text-base font-semibold">{client.name}</div>
+            <div className="font-normal text-gray-500">{client.email}</div>
+          </div>
+        </th>
+        <td className="px-6 py-4">{client.email}</td>
+        <td className="px-6 py-4">
+          <div className="flex items-center">{client.phone}</div>
+        </td>
+        <td className="px-6 py-4 flex flex-row space-x-4">
+          <button className="text-blue-500 text-center   bg-gray-50 p-2 rounded-md " onClick={toggleEditModal}>
+            <FaEdit />
+          </button>
+          <Link to={`/clients/${client.id}`} className="text-gray-700  bg-gray-50 p-2 rounded-md ">
+            <FaEye />
+          </Link>
+          <button className="text-red-600 bg-gray-50 p-2 rounded-md " onClick={toggleConfirmDeleteModal}>
+            <BsTrash />
+          </button>
+        </td>
+      </tr>
+    </>
   );
 };
 

@@ -6,6 +6,13 @@ const GET_PROJECTS = gql`
       id
       name
       status
+      client{
+        id
+        name,
+        email,
+        phone
+  
+  }
     }
   }
 `;
@@ -17,6 +24,8 @@ const GET_PROJECT = gql`
       name
       description
       status
+      createdAt
+      updatedAt
       client {
         id
         name

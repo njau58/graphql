@@ -2,6 +2,9 @@
 
 const Project = require("../models/Project");
 const Client = require("../models/Client");
+const {dateCreatedScalar, dateUpdatedScalar} = require("./dateCustomScalar")
+
+
 
 const {
   GraphQLObjectType,
@@ -11,6 +14,7 @@ const {
   GraphQLList,
   GraphQLNonNull,
   GraphQLEnumType,
+  GraphQLScalarType,
 } = require("graphql");
 
 const ClientType = new GraphQLObjectType({
@@ -20,6 +24,8 @@ const ClientType = new GraphQLObjectType({
     name: { type: GraphQLString },
     phone: { type: GraphQLString },
     email: { type: GraphQLString },
+    createdAt:{type:GraphQLString},
+    updatedAt:{type:GraphQLString},
   }),
 });
 
@@ -30,6 +36,8 @@ const ProjectType = new GraphQLObjectType({
     name: { type: GraphQLString },
     status: { type: GraphQLString },
     description: { type: GraphQLString },
+    createdAt:{type: new GraphQLScalarType(dateCreatedScalar)},
+    updatedAt:{type: new GraphQLScalarType(dateUpdatedScalar)},
     client: {
       type: ClientType,
       resolve(parent, args) {
@@ -71,6 +79,14 @@ const RootQuery = new GraphQLObjectType({
         return Project.find();
       },
     },
+    projectsById: {
+      type: new GraphQLList(ProjectType),
+      args: { id: { type: GraphQLID } },
+      resolve(parent, args) {
+        return Project.findById(args.id);
+      },
+    },
+
   },
 });
 

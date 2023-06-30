@@ -1,10 +1,14 @@
-import Header from "./components/Header";
+
 import Home from "./pages/Home";
 import Project from "./pages/Project";
 import NotFound from "./pages/NotFound";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 
-import {BrowserRouter as  Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { ToggleProvider } from "./context/ToggleSideBarContext";
+import Clients from "./components/Clients";
+import Projects from "./components/Projects";
+import ClientDetailsPage from "./components/ClientDetailsPage";
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -26,7 +30,7 @@ const cache = new InMemoryCache({
 });
 
 const client = new ApolloClient({
-uri: `${process.env.REACT_APP_API_URL}`,
+  uri: `${process.env.REACT_APP_API_URL}`,
   cache: cache,
 });
 
@@ -34,16 +38,19 @@ function App() {
   return (
     <>
       <ApolloProvider client={client}>
-        <Router>
-          <Header />
-          <div className="container  pt-5 pb-5">
+        <ToggleProvider>
+          <Router>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/projects" element={<Projects/>} />
+              <Route path="/clients" element={<Clients />} />
               <Route path="/projects/:id" element={<Project />} />
+              <Route path="/clients/:id" element={<ClientDetailsPage/>}/>
+              <Route path="/project" element={<Project />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </div>
-        </Router>
+          </Router>
+        </ToggleProvider>
       </ApolloProvider>
     </>
   );

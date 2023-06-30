@@ -11,7 +11,6 @@ const DELETE_CLIENT = gql`
   }
 `;
 
-
 const ADD_CLIENT = gql`
   mutation addClient($name: String!, $email: String!, $phone: String!) {
     addClient(name: $name, email: $email, phone: $phone) {
@@ -23,8 +22,15 @@ const ADD_CLIENT = gql`
   }
 `;
 
+const EDIT_CLIENT = gql`
+  mutation editClient($id: ID!, $name: String!, $email: String!, $phone: String!) {
+    editClient(id:$id, name: $name, email: $email, phone: $phone) {
+      id
+      name
+      email
+      phone
+    }
+  }
+`;
 
-
-
-
-export { DELETE_CLIENT,ADD_CLIENT };
+export { DELETE_CLIENT, ADD_CLIENT, EDIT_CLIENT };
