@@ -1,23 +1,24 @@
 const mongoose = require("mongoose");
 
-const ClientSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    index: true,
-    unique:true
+const ClientSchema = new mongoose.Schema(
+  {
+    authorId: {
+      type: String,
+    },
+    name: {
+      type: String,
+      index: true,
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
   },
-  email: {
-    type: String,
-  },
-  phone: {
-    type: String,
-    
-  },
-  
-},
-{
-  timestamps: true,
-}
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = mongoose.model('Clients', ClientSchema)
+module.exports = mongoose.model("Clients", ClientSchema);

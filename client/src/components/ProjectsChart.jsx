@@ -12,7 +12,7 @@ const ProjectsChart = () => {
   const [series, setSeries] = useState([]);
   const [percantateRep, setPercentageRep] = useState([]);
 
-  console.log(data);
+
   useEffect(() => {
     if (data && !loading && !error) {
       const completed = data.projects.filter(
@@ -134,7 +134,7 @@ const ProjectsChart = () => {
         </div>
         <div></div>
       </div>
-      {data.projects.length > 0 ? (
+      {data?.projects.length > 0 ? (
         renderUI()
       ) : (
         <div className="flex items-center justify-center font-light py-12">

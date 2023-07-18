@@ -5,7 +5,11 @@ const GET_PROJECTS = gql`
     projects {
       id
       name
+      createdAt
+      updatedAt
       status
+      startDate
+      dueDate
       client{
         id
         name,
@@ -26,6 +30,8 @@ const GET_PROJECT = gql`
       status
       createdAt
       updatedAt
+      startDate
+      dueDate
       client {
         id
         name

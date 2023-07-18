@@ -2,10 +2,12 @@ import React from "react";
 import moment from "moment";
 
 const ProjectCard = ({ project }) => {
+
+  console.log(project)
   return (
-    <div className="p-6    bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 hover:shadow-lg dark:border-gray-700 ">
+    <div className="p-4    bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 hover:shadow-lg dark:border-gray-700 ">
       <div className="flex flex-col space-y-9 justify-content-between align-items-center">
-        <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <h5 className="mb-2 text-lg font-bold tracking-tight text-gray-900 dark:text-white">
           {project.name}
         </h5>
 
@@ -18,7 +20,7 @@ const ProjectCard = ({ project }) => {
           </a>
         </div>
       </div>
-      <p className="small">
+      <p className="text-sm font-semibold">
         Status:{" "}
         <span
           className={`${

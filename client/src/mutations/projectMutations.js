@@ -6,8 +6,12 @@ const ADD_PROJECT = gql`
     $description: String!
     $status: ProjectStatus!
     $clientId: ID!
+    $startDate: String!
+    $dueDate: String!
   ) {
     addProject(
+      startDate: $startDate
+      dueDate: $dueDate
       name: $name
       description: $description
       status: $status
@@ -16,6 +20,8 @@ const ADD_PROJECT = gql`
       id
       name
       description
+      startDate
+      dueDate
       status
       client {
         id
@@ -50,8 +56,12 @@ const UPDATE_PROJECT = gql`
     $name: String!
     $description: String!
     $status: ProjectStatusUpdate!
+    $startDate: String!
+    $dueDate: String!
   ) {
     updateProject(
+      startDate: $startDate
+      dueDate: $dueDate
       name: $name
       description: $description
       status: $status
@@ -61,6 +71,8 @@ const UPDATE_PROJECT = gql`
       name
       description
       status
+      startDate
+      dueDate
       client {
         id
         name

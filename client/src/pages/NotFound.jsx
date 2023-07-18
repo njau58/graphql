@@ -5,7 +5,7 @@ import error from '../components/assets/error.svg'
 
 export default function NotFound() {
   return (
-    <DefaultLayout>
+   
       <div className="flex flex-col space-y-4 bg-white items-center justify-center  py-16 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
      <img  src={error}></img>
         <p className="lead text-2xl font-bold mt-2">Sorry, the page can’t be found</p>
@@ -14,6 +14,6 @@ export default function NotFound() {
          <span className="inline-block pl-2"><FaArrowLeft/></span> Back To Home
         </Link>
       </div>
-    </DefaultLayout>
+    
   );
 }

@@ -117,11 +117,11 @@ const Projects = () => {
                   </div>
                 </form>
               </div>
-              <div class="flex justify-between space-x-4 w-full ">
+              <div class="flex justify-end space-x-4 w-full ">
                 <select
                   value={filterByStatus}
                   onChange={(e) => setFilterByStatus(e.target.value)}
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[10rem] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  class=" border border-gray-300 text-gray-900 bg-white text-sm justify-end rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[10rem] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   <option selected value="">
                     Filter by status
@@ -131,7 +131,7 @@ const Projects = () => {
                   <option value="In Progress">In Progress</option>
                 </select>
 
-                <button
+                {/* <button
                   onClick={toggleNewProjectModal}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg "
                 >
@@ -140,13 +140,26 @@ const Projects = () => {
                     <FaPlus />
                   </span>{" "}
                   New Project
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
+          <div className="flex flex-col items-start  justify-start ">
+             <button
+                  onClick={toggleNewProjectModal}
+                  className="px-4  py-4 mb-2 border-4 border-dotted text-gray-500 rounded-xl "
+                >
+                  <span className="">
+                    {" "}
+                    <FaPlus />
+                  </span>{" "}
+              
+                </button>
+                <span className="text-sm mb-12 text-gray-600">New Project</span>
+             </div>
 
           {data.projects.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto grid-cols-1">
+            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto grid-cols-1 ">
               {mergedArray.map((project) => {
                 return (
                   <ProjectCard key={project.id} project={project}></ProjectCard>
@@ -156,6 +169,7 @@ const Projects = () => {
           ) : (
             <p className="flex justify-center items-center my-12 font-light">There are no projects.</p>
           )}
+             
         </>
       );
   };

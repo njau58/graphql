@@ -4,7 +4,7 @@ export default function ClientInfo({ client }) {
   return (
     <div className="px-9 py-4 h-full w-full rounded-lg border bg-white ">
 
-      <h5 className="text-2xl font-bold  text-gray-900 dark:text-white my-6">
+      <h5 className="text-2xl font-medium  text-gray-900 dark:text-white my-6">
         Client Information
       </h5>
 

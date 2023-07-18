@@ -1,46 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_PROJECT } from "../queries/projectQueries";
 import Spinner from "../components/Spinner";
 import ClientInfo from "../components/ClientInfo";
-
 import DefaultLayout from "../layout/DefaultLayout";
 import { AiOutlineReload } from "react-icons/ai";
-import { FaTrash } from "react-icons/fa";
 import Breadcrumb from "../components/BreadCrumb";
-import { BsArrowLeft } from "react-icons/bs";
+import { AiOutlineEllipsis } from "react-icons/ai";
 import ConfirmDeleteProject from "../components/ConfirmDeleteProject";
 import EditProjectModal from "../components/EditProjectModal";
-import moment from 'moment'
+import moment from "moment";
+import useToggle from "../customHooks/useToggle";
 
 const Project = () => {
   const { id } = useParams();
-  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
-  const [showProjectEditModal, setShowProjectEditModal] = useState(false);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useToggle(false);
+  const [showProjectEditModal, setShowProjectEditModal] = useToggle(false);
+  const [showActions, setShowActions] = useToggle(false);
 
+  const [daysDue, setDaysDue] = useState(0);
   const { loading, error, data } = useQuery(GET_PROJECT, {
     variables: { id: id },
   });
 
-  console.log('created',new Date(data?.project.createdAt))
-  console.log('updated',new Date(data?.project.updatedAt))
+  
 
+  useEffect(() => {
+    const due = new Date(data?.project.dueDate).getTime() / 1000;
+    const diff = (due - new Date().getTime() / 1000) / 86400;
+    console.log(diff);
+    if (diff < 1) {
+      setDaysDue("Today");
+    } else {
+      setDaysDue(diff.toFixed(0));
+    }
+  }, [data]);
 
   const reloadPage = () => {
     window.location.reload();
   };
 
-  const toggleConfirmDeleteModal = () => {
-    setShowConfirmDeleteModal(!showConfirmDeleteModal);
-  };
-  const toggleEditProjectModal = () => {
-    setShowProjectEditModal(!showProjectEditModal);
-  };
   if (loading)
     return (
       <DefaultLayout>
-        <div className="mx-auto flex items-center justify-center ">
+        <div className="mx-auto flex items-center justify-center  h-screen my-auto mt-32">
           <Spinner />
         </div>
       </DefaultLayout>
@@ -103,23 +107,90 @@ const Project = () => {
                   {data.project.status}
                 </p>
               </div>
-           
             </div>
-
           </div>
           <div className="flex flex-col md:flex-row md:justify-between space-y-6 md:space-y-0 md:space-x-6 ">
             <div className="border p-6 w-full rounded-md bg-white">
-              <h1 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {data.project.name}
-              </h1>
-              <p className="font-normal text-gray-700 dark:text-gray-400 h-72 overflow-auto p-2 ">
+              <div className=" relative flex flex-row justify-between w-full mb-6">
+                {" "}
+                <h1 className="mb-2 text-xl font-medium tracking-tight text-gray-900 dark:text-white">
+                  {data.project.name}
+                </h1>
+                <div>
+                  <div
+                    onClick={setShowActions
+                    }
+                    className="text-3xl font-bold rounded-full hover:bg-gray-100"
+                  >
+                    <AiOutlineEllipsis />
+                  </div>
+                  {showActions && (
+                    <>
+                      <div
+                        onClick={setShowActions}
+                        class="fixed top-0 left-0 right-0 z-30 bg-transparent bg-opacity-70  w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0  h-screen"
+                      ></div>
+                      <div className=" absolute z-40 flex flex-col text-sm py-4  w-32 px-2 items-center space-y-4  border right-2   bg-white border-gray-200 rounded-lg">
+                        <div
+                          onClick={setShowProjectEditModal}
+                          className="hover:bg-gray-300 py-2 cursor-pointer  rounded-lg w-full text-center"
+                        >
+                          Update
+                        </div>
+                        <div
+                          onClick={setShowConfirmDeleteModal}
+                          className="hover:bg-gray-300 py-2 cursor-pointer  rounded-lg w-full text-center"
+                        >
+                          Delete
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <p className="font-normal bg-gray-50 text-gray-700 dark:text-gray-400 h-72 overflow-auto p-2 ">
                 {data.project.description}
               </p>
-              <div className="flex flex-col mt-12 space-y-4">
-                <div className="text-sm font-semibold">Created:<span className="pl-2 text-sm text-gray-600 font-light">{moment(data?.project.createdAt).format("YYYY-MM-DD HH:mm:ss")}</span></div>
-                <div className="text-sm font-semibold">Updated:<span className="pl-2 text-sm text-gray-600 font-light">{moment(data?.project.updatedAt).format("YYYY-MM-DD HH:mm:ss")}</span></div>
-
-
+              <div className="flex flex-row justify-between items-center">
+                <div className="flex flex-col mt-12 space-y-4">
+                  <div className="text-sm font-semibold">
+                    Created:
+                    <span className="pl-2 text-sm text-gray-600 font-light">
+                      {moment(data?.project.createdAt).format(
+                        "YYYY-MM-DD HH:mm"
+                      )}
+                    </span>
+                  </div>
+                  <div className="text-sm font-semibold">
+                    Updated:
+                    <span className="pl-2 text-sm text-gray-600 font-light">
+                      {moment(data?.project.updatedAt).format(
+                        "YYYY-MM-DD HH:mm"
+                      )}
+                    </span>
+                  </div>
+                  <div className="text-sm font-semibold">
+                    StartDate:
+                    <span className="pl-2 text-sm text-gray-600 font-light">
+                      {moment(data?.project.startDate).format("YYYY-MM-DD")}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    Due:
+                    <span className="pl-2 text-sm text-gray-600 font-light">
+                      {data.project.dueDate}
+                    </span>
+                  </div>
+                  <div className="font-bold text-sm mt-3">
+                    {daysDue === "Today" ? (
+                      <div className="text-red-500">Project is due Today</div>
+                    ) : (
+                      <div>({daysDue} days remaining)</div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -127,26 +198,6 @@ const Project = () => {
           </div>
 
           <hr className="mt-6"></hr>
-
-          <div className="flex flex-row bg-white  space-x-6 items-center justify-center mt-6 border rounded-md p-12">
-            <button
-              onClick={toggleEditProjectModal}
-              type="submit"
-              class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Update
-            </button>
-            <button
-              onClick={toggleConfirmDeleteModal}
-              type="button"
-              class="text-white flex items-center justify-center bg-red-600   hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-            >
-              <span className="">
-                <FaTrash className="mr-2"></FaTrash>
-              </span>{" "}
-              Delete
-            </button>
-          </div>
         </div>
       );
   };
@@ -155,7 +206,7 @@ const Project = () => {
     <DefaultLayout>
       {showConfirmDeleteModal && (
         <ConfirmDeleteProject
-          toggleModal={toggleConfirmDeleteModal}
+          toggleModal={setShowConfirmDeleteModal}
           projectId={data.project.id}
         />
       )}
@@ -163,7 +214,7 @@ const Project = () => {
       {showProjectEditModal && (
         <EditProjectModal
           project={data.project}
-          toggleModal={toggleEditProjectModal}
+          toggleModal={setShowProjectEditModal}
         />
       )}
 

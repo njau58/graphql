@@ -9,7 +9,12 @@ module.exports = {
     './src/**/*.{js,jsx,ts,tsx,vue}',
   ],
   theme: {
-    extend: {},
+
+    
+    extend: {
+      backgroundImage:{
+        'splash':"url('./components/assets/splash.jpg')"}
+    },
   },
   plugins: [],
 }

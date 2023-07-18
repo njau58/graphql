@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { FaList } from "react-icons/fa";
+
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_PROJECT } from "../mutations/projectMutations";
 import { GET_PROJECTS } from "../queries/projectQueries";
 import { GET_CLIENTS } from "../queries/clientQueries";
+import moment from "moment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+
 
 const AddProjectModal = ({ toggleModal }) => {
   const { data } = useQuery(GET_CLIENTS);
+  const [startDate, setStartDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  
 
   const [formData, setFormData] = useState({
     name: "",
@@ -21,6 +30,9 @@ const AddProjectModal = ({ toggleModal }) => {
       description: formData.description,
       clientId: formData.clientId,
       status: formData.status,
+
+      startDate: moment(startDate?.$d).format("YYYY-MM-DD"),
+      dueDate: moment(dueDate?.$d).format("YYYY-MM-DD"),
     },
     onError: (error) => {
       alert(error);
@@ -41,8 +53,6 @@ const AddProjectModal = ({ toggleModal }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  console.log(formData);
-
   const onSubmit = (e) => {
     e.preventDefault();
 
@@ -50,24 +60,24 @@ const AddProjectModal = ({ toggleModal }) => {
       formData.name === "" ||
       formData.description === "" ||
       formData.status === "" ||
-      formData.clientId === ""
+      formData.clientId === "" ||
+      startDate === "" ||
+      dueDate === ""
     ) {
       return alert("Please fiil all the fields.");
     }
     addProject();
-    toggleModal()
+    toggleModal();
   };
 
   return (
     <>
-     
-
       <div
         aria-hidden="true"
         class="fixed top-0 left-0 right-0 z-50 bg-gray-800 bg-opacity-70  w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0  h-screen"
       >
         <div class="relative  mx-auto max-w-md h-full">
-          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div class="relative bg-white rounded-lg  shadow dark:bg-gray-700">
             <button
               type="button"
               onClick={toggleModal}
@@ -126,6 +136,27 @@ const AddProjectModal = ({ toggleModal }) => {
                     class="block p-2.5 w-full  pb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Write a description for the project..."
                   ></textarea>
+                </div>
+
+                <div className="flex flex-row justify-between space-x-4 pt-6 w-full">
+                <div className=" mb-4">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Start date"
+                        value={startDate}
+                        onChange={(newValue) => setStartDate(newValue)}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                  <div className=" mb-4">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Due date"
+                        value={dueDate}
+                        onChange={(newValue) => setDueDate(newValue)}
+                      />
+                    </LocalizationProvider>
+                  </div>
                 </div>
 
                 <div className="mb-4">

@@ -3,10 +3,25 @@ import { FaTrash, FaUser } from "react-icons/fa";
 import { useMutation } from "@apollo/client";
 import { GET_PROJECT } from "../queries/projectQueries";
 import { UPDATE_PROJECT } from "../mutations/projectMutations";
+// import { DatePicker } from "antd";
+import { format } from "date-fns";
+import moment from "moment";
+
+import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const EditProjectModal = ({ toggleModal, project }) => {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description);
+  const [startDate, setStartDate] = useState(dayjs(project.startDate));
+  const [dueDate, setDueDate] = useState(dayjs(project.dueDate));
+
+
+
+  
+
   const [status, setStatus] = useState(() => {
     switch (project.status) {
       case "Not Started":
@@ -21,7 +36,14 @@ const EditProjectModal = ({ toggleModal, project }) => {
   });
 
   const [updateProject] = useMutation(UPDATE_PROJECT, {
-    variables: { id: project.id, name, description, status },
+    variables: {
+      id: project.id,
+      name,
+      description,
+      status,
+      startDate: moment(startDate?.$d).format("YYYY-MM-DD"),
+      dueDate: moment(dueDate?.$d).format("YYYY-MM-DD"),
+    },
     refetchQueries: [{ query: GET_PROJECT, variables: { id: project.id } }],
   });
 
@@ -32,10 +54,11 @@ const EditProjectModal = ({ toggleModal, project }) => {
       return alert("Please fill out all fields");
     }
 
-    updateProject().then(res=>{
-        closeModal()
-    }).catch(error=>alert(error));
-    
+    updateProject()
+      .then((res) => {
+        closeModal();
+      })
+      .catch((error) => alert(error));
   };
 
   const closeModal = () => {
@@ -108,6 +131,26 @@ const EditProjectModal = ({ toggleModal, project }) => {
                     class="block p-2.5 w-full  pb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Write a description for the project..."
                   ></textarea>
+                </div>
+                <div className="flex flex-row justify-between space-x-4 pt-6 w-full">
+                <div className=" mb-4">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Start date"
+                        value={startDate}
+                        onChange={(newValue) => setStartDate(newValue)}
+                      />
+                    </LocalizationProvider>
+                  </div>
+                  <div className=" mb-4">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Due date"
+                        value={dueDate}
+                        onChange={(newValue) => setDueDate(newValue)}
+                      />
+                    </LocalizationProvider>
+                  </div>
                 </div>
 
                 <div className="mb-4">

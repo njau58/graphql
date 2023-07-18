@@ -1,100 +1,73 @@
-// const { projects, clients } = require("../schema/sampleData");
-
 const Project = require("../models/Project");
 const Client = require("../models/Client");
-const {dateCreatedScalar, dateUpdatedScalar} = require("./dateCustomScalar")
-
-
-
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const { ClientType, ProjectType, UserType } = require("./typeDefs");
 const {
   GraphQLObjectType,
   GraphQLID,
   GraphQLString,
-  GraphQLSchema,
-  GraphQLList,
+
   GraphQLNonNull,
   GraphQLEnumType,
-  GraphQLScalarType,
 } = require("graphql");
+const { generateToken } = require("../util/generateJWT");
 
-const ClientType = new GraphQLObjectType({
-  name: "Client",
-  fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    phone: { type: GraphQLString },
-    email: { type: GraphQLString },
-    createdAt:{type:GraphQLString},
-    updatedAt:{type:GraphQLString},
-  }),
-});
-
-const ProjectType = new GraphQLObjectType({
-  name: "Project",
-  fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    status: { type: GraphQLString },
-    description: { type: GraphQLString },
-    createdAt:{type: new GraphQLScalarType(dateCreatedScalar)},
-    updatedAt:{type: new GraphQLScalarType(dateUpdatedScalar)},
-    client: {
-      type: ClientType,
-      resolve(parent, args) {
-        return Client.findById(parent.clientId);
-      },
-    },
-  }),
-});
-
-const RootQuery = new GraphQLObjectType({
-  name: "RootQuery",
-  fields: {
-    clients: {
-      type: new GraphQLList(ClientType),
-      resolve(parent, args) {
-        return Client.find();
-      },
-    },
-
-    client: {
-      type: ClientType,
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Client.findById(args.id);
-      },
-    },
-
-    project: {
-      type: ProjectType,
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Project.findById(args.id);
-      },
-    },
-
-    projects: {
-      type: new GraphQLList(ProjectType),
-      resolve(parent, arg) {
-        return Project.find();
-      },
-    },
-    projectsById: {
-      type: new GraphQLList(ProjectType),
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Project.findById(args.id);
-      },
-    },
-
-  },
-});
-
-//Mutations
-
-const mutation = new GraphQLObjectType({
+const RootMutation = new GraphQLObjectType({
   name: "Mutations",
   fields: {
+    //Register user
+
+    register: {
+      type: GraphQLString,
+      description: "Register new user",
+      args: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) },
+      },
+
+      async resolve(parent, args) {
+        const userExist = await User.findOne({ email: args.email });
+        if (userExist) throw new Error("Email address already in use");
+
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(args.password, salt);
+
+        const user = new User({
+          email: args.email,
+          password: hashedPassword,
+        });
+
+        user.save();
+
+        const token = generateToken(user);
+
+        return token;
+      },
+    },
+
+    //Login
+
+    login: {
+      type: GraphQLString,
+      args: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) },
+      },
+
+      async resolve(parent, args) {
+        const userRegistered = await User.findOne({ email: args.email });
+        if (!userRegistered) throw new Error("Email not registered");
+        if (!(await bcrypt.compare(args.password, userRegistered.password)))
+          throw new Error("Invalid credentials");
+
+        if (await bcrypt.compare(args.password, userRegistered.password)) {
+          const token = generateToken(userRegistered);
+          return token;
+        }
+      },
+    },
+
     //add client
     addClient: {
       type: ClientType,
@@ -104,8 +77,9 @@ const mutation = new GraphQLObjectType({
         phone: { type: new GraphQLNonNull(GraphQLString) },
       },
 
-      resolve(parent, args) {
+      resolve(parent, args,{verifiedUser}) {
         const client = new Client({
+authorId:verifiedUser.user._id,
           name: args.name,
           email: args.email,
           phone: args.phone,
@@ -123,19 +97,14 @@ const mutation = new GraphQLObjectType({
       },
 
       resolve(parent, args) {
-
-        Project.find({clientId:args.id}).then(projects=>{
-          projects.forEach(project=>{
-            project.deleteOne()
-          })
-
-        })
-
+        Project.find({ clientId: args.id }).then((projects) => {
+          projects.forEach((project) => {
+            project.deleteOne();
+          });
+        });
 
         return Client.findByIdAndDelete(args.id);
       },
-
-
     },
 
     //edit client
@@ -164,6 +133,8 @@ const mutation = new GraphQLObjectType({
       type: ProjectType,
       args: {
         name: { type: new GraphQLNonNull(GraphQLString) },
+        startDate: { type: new GraphQLNonNull(GraphQLString) },
+        dueDate: { type: new GraphQLNonNull(GraphQLString) },
         description: { type: new GraphQLNonNull(GraphQLString) },
         status: {
           type: new GraphQLEnumType({
@@ -180,12 +151,15 @@ const mutation = new GraphQLObjectType({
         clientId: { type: new GraphQLNonNull(GraphQLID) },
       },
 
-      resolve(parent, args) {
+      resolve(parent, args,{verifiedUser}) {
         const project = new Project({
           name: args.name,
+          authorId:verifiedUser.user._id,
           description: args.description,
           status: args.status,
           clientId: args.clientId,
+          startDate: args.startDate,
+          dueDate: args.dueDate,
         });
 
         return project.save();
@@ -198,6 +172,8 @@ const mutation = new GraphQLObjectType({
       type: ProjectType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLID) },
+        startDate: { type: new GraphQLNonNull(GraphQLString) },
+        dueDate: { type: new GraphQLNonNull(GraphQLString) },
         name: { type: GraphQLString },
         description: { type: GraphQLString },
         status: {
@@ -220,6 +196,8 @@ const mutation = new GraphQLObjectType({
               name: args.name,
               description: args.description,
               status: args.status,
+              startDate: args.startDate,
+              dueDate: args.dueDate,
             },
           },
           { new: true }
@@ -241,8 +219,4 @@ const mutation = new GraphQLObjectType({
     },
   },
 });
-
-module.exports = new GraphQLSchema({
-  query: RootQuery,
-  mutation,
-});
+module.exports = { RootMutation };

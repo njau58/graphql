@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { FaTrash, FaUser } from "react-icons/fa";
 import { useMutation } from "@apollo/client";
-import { ADD_CLIENT } from "../mutations/clientMutations";
-import { GET_CLIENTS } from "../queries/clientQueries";
+
 import { EDIT_CLIENT } from "../mutations/clientMutations";
+import { GET_CLIENT } from "../queries/clientQueries";
 
 const EditClientModal = ({ toggleModal, client }) => {
   const [formData, setFormData] = useState({
@@ -22,7 +22,7 @@ const EditClientModal = ({ toggleModal, client }) => {
     onError:(error)=>{
         alert(error)
             },
-    refetchQueries: [{ query: GET_CLIENTS }],
+    refetchQueries: [{ query: GET_CLIENT, variables: { id: client.id } }],
   });
 
   const handleOnChange = (e) => {
