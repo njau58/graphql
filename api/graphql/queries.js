@@ -5,6 +5,7 @@ const {
   GraphQLObjectType,
   GraphQLID,
   GraphQLList,
+  GraphQLString,
 } = require("graphql");
 
 const RootQuery = new GraphQLObjectType({
@@ -12,8 +13,8 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     clients: {
       type: new GraphQLList(ClientType),
-      resolve(parent, args,{verifiedUser}) {
-        return Client.find({authorId:verifiedUser.user._id});
+      resolve(parent, args, { verifiedUser }) {
+        return Client.find({ authorId: verifiedUser.user._id });
       },
     },
 
@@ -35,12 +36,18 @@ const RootQuery = new GraphQLObjectType({
 
     projects: {
       type: new GraphQLList(ProjectType),
-      resolve(parent, arg,{verifiedUser}) {
-        return Project.find({authorId:verifiedUser.user._id});
+      resolve(parent, arg, { verifiedUser }) {
+        return Project.find({ authorId: verifiedUser.user._id });
       },
     },
-   
+
+    user: {
+      type: GraphQLString,
+      resolve(parent, _, { verifiedUser }) {
+        return verifiedUser.user.email;
+      },
+    },
   },
 });
 
-module.exports = {RootQuery};
+module.exports = { RootQuery };

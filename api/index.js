@@ -5,28 +5,35 @@ const colors = require("colors");
 const schema = require("./graphql/schema"); //graphql schema
 const { graphqlHTTP } = require("express-graphql");
 const cors = require("cors");
+const http = require("http");
+const { ApolloServer, gql } = require("apollo-server-express");
+const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core");
+const { authenticate } = require("./middleware/auth");
 
 const { dbConnect } = require("./config/db");
 const app = express();
-const {authenticate} = require('./middleware/auth')
 
-//MongoDB connection
 dbConnect();
 
-app.use(authenticate)
+app.use(authenticate);
 
 app.use(cors());
+app.use(express.json());
 
-// app.use(authenticate)
+// const httpServer = http.createServer(app);
 
+// const startApolloServer = async (app, httpServer) => {
+//   const server = new ApolloServer({
+//     schema,
+//     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+//   });
 
-app.get('/test',(req,res)=>{
+//   await server.start();
+//   server.applyMiddleware({ app});
+// };
+// startApolloServer(app, httpServer);
 
-  console.log(req.verifiedUser)
-
-})
-
-
+// module.exports = httpServer;
 app.use(
   "/api",
   graphqlHTTP({
@@ -38,6 +45,5 @@ app.use(
 if(port){
   app.listen(port, ()=>console.log(`Server listening to port ${port}`))
 }
-
 
 module.exports = app;
