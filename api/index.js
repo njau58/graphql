@@ -6,8 +6,8 @@ const schema = require("./graphql/schema"); //graphql schema
 const { graphqlHTTP } = require("express-graphql");
 const cors = require("cors");
 const http = require("http");
-const { ApolloServer, gql } = require("apollo-server-express");
-const { ApolloServerPluginDrainHttpServer } = require("apollo-server-core");
+// const { ApolloServer, gql } = require("apollo-server-express");
+// const { ApolloServerPluginDrainHttpServer } = require("pollo-server-express"");
 const { authenticate } = require("./middleware/auth");
 
 const { dbConnect } = require("./config/db");

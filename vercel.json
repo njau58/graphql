@@ -1,7 +1,7 @@
 
   {
     "routes": [
-    { "src": "/graphql", "dest": "/api/graphql" },
-    { "src": "/.*", "dest": "/api" }
+    { "src": "/graphql", "destination": "/api/graphql" },
+    { "src": "/.*", "destination": "/api" }
     ]
     }
