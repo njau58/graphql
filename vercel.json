@@ -1,7 +1,5 @@
 
-  {
-    "routes": [
-    { "src": "/graphql", "destination": "/api/graphql" },
-    { "src": "/.*", "destination": "/api" }
-    ]
+
+    {
+      "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
     }
